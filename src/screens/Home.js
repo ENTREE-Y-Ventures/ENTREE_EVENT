@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
 
 
   return (
