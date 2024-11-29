@@ -11,15 +11,16 @@ const Recipe = ({navigation}) => {
 
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text>Recipe Page</Text>
-    </ScrollView>
+    </View>
   )
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#121212',
   },
 });
 
