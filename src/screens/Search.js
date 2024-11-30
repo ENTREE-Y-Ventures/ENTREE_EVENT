@@ -76,7 +76,7 @@ const Search = ({navigation}) => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="오늘의 저녁 메뉴는 뭘까요?"
+          placeholder="오늘의 저녁 메뉴는?"
           placeholderTextColor="#666"
           value={searchText}
           onChangeText={setSearchText}
