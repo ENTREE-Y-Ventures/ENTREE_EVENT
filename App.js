@@ -9,6 +9,7 @@ import Scrap from './src/screens/Scrap';
 import Search from './src/screens/Search';
 import Recipe from './src/screens/Recipe';
 import { addScrap, deleteScrap, getAllScraps } from './database/RealmDatabase';
+import { ScrapProvider } from './src/components/ScrapContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -159,9 +160,11 @@ const TabNavigator = () => (
 const App = () => {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <TabNavigator />
-      </NavigationContainer>
+      <ScrapProvider>
+        <NavigationContainer>
+          <TabNavigator />
+        </NavigationContainer>
+      </ScrapProvider>
     </SafeAreaProvider>
   );
 };

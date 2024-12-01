@@ -88,6 +88,7 @@ const Home = () => {
         )}
         keyExtractor={item => item.id.toString()}
         horizontal={true}
+        contentContainerStyle={styles.recipeList}
       />
 
       <Section title={'Top 3 Christmas\nDessert Recipes'} />

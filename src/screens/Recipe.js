@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import { useScrap } from '../components/ScrapContext';
 
 const ScrapTabIcon = require('../assets/scrap_icon.png');
 
@@ -162,20 +163,16 @@ const recipesDetailData = {
 };
 
 const Recipe = ({ route, navigation }) => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const { recipeId } = route.params || {};
-  const recipeData = recipesDetailData[recipeId];
+  const { isScraped, toggleScrap } = useScrap();
+  const isBookmarked = isScraped(recipeId);
 
-  // useEffect를 사용하여 navigation options 설정
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => {
-            setIsBookmarked(!isBookmarked);
-            // 여기에 북마크 저장 로직 추가
-          }}
-          style={{ marginRight: 16 }}
+          onPress={() => toggleScrap(recipeId)}
+          style={{ marginRight: 16, padding: 8 }}
         >
           <Image
             source={ScrapTabIcon}
@@ -188,7 +185,9 @@ const Recipe = ({ route, navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, isBookmarked]);
+  }, [navigation, isBookmarked, recipeId]);
+
+  const recipeData = recipesDetailData[recipeId];
 
   if (!recipeData) {
     return (
