@@ -11,31 +11,63 @@ import {
 
 const SearchIcon = require('../assets/search_icon.png');
 
-// 임시 레시피 데이터
-const recipeData = [
+// 기존 recipeData 제거하고 Home의 데이터 통합
+const allRecipes = [
+  // Dinner Recipes
   {
-    id: '1',
-    title: '까르보나라',
-    description: '크리미한 파스타 with 베이컨, 파마산 치즈',
-    cookTime: '30분',
+    id: 1,
+    title: 'Spaghetti Carbonara',
+    author: 'Ian Fisher',
+    image: require('../assets/Spaghetti_Carbonara.png'),
+    reviews: '12,897',
+    ratingScore: 5,
+    cookTime: '30 minutes',
   },
   {
-    id: '2',
-    title: '스테이크',
-    description: '버터와 허브향이 가득한 립아이 스테이크',
-    cookTime: '25분',
+    id: 2,
+    title: 'Cast-Iron Steak',
+    author: 'Julia Moskin',
+    image: require('../assets/Cast-Iron_Steak.png'),
+    reviews: '5,556',
+    ratingScore: 5,
+    cookTime: '1 hour',
   },
   {
-    id: '3',
-    title: '라따뚜이',
-    description: '프랑스식 채소 요리, 허브드프로방스 향이 가득',
-    cookTime: '45분',
+    id: 3,
+    title: 'Ratatouille',
+    author: 'Melissa Clark',
+    image: require('../assets/Ratatouille.png'),
+    reviews: '3,110',
+    ratingScore: 5,
+    cookTime: '3 hour',
+  },
+  // Dessert Recipes
+  {
+    id: 1000,
+    title: 'Strawberry Pavlova',
+    author: 'Nigella Lawson',
+    image: require('../assets/Strawberry_Pavlova.png'),
+    reviews: '2,941',
+    ratingScore: 5,
+    cookTime: '2 hours',
   },
   {
-    id: '4',
-    title: '컵케이크',
-    description: '부드럽고 달콤한 휘핑크림 컵케이크',
-    cookTime: '40분',
+    id: 1001,
+    title: 'Peanut Butter Blossoms',
+    author: 'the Gerrero family',
+    image: require('../assets/Peanut_Butter_Blossoms.png'),
+    reviews: '6,913',
+    ratingScore: 5,
+    cookTime: '35 minutes',
+  },
+  {
+    id: 1002,
+    title: 'Magnolia Bakery\'s Cupcakes',
+    author: 'Susan Campos',
+    image: require('../assets/Magnolia_Bakerys_Cupcakes.png'),
+    reviews: '3,139',
+    ratingScore: 5,
+    cookTime: '45 minutes',
   },
 ];
 
@@ -45,7 +77,7 @@ const Search = ({navigation}) => {
 
   useEffect(() => {
     if (searchText) {
-      const filtered = recipeData.filter(recipe =>
+      const filtered = allRecipes.filter(recipe =>
         recipe.title.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredRecipes(filtered);
@@ -59,9 +91,10 @@ const Search = ({navigation}) => {
       style={styles.recipeItem}
       onPress={() => navigation.navigate('Recipe', { recipeId: item.id })}
     >
+      <Image source={item.image} style={styles.recipeImage} />
       <View style={styles.recipeContent}>
         <Text style={styles.recipeTitle}>{item.title}</Text>
-        <Text style={styles.recipeDescription}>{item.description}</Text>
+        <Text style={styles.recipeAuthor}>by {item.author}</Text>
         <Text style={styles.cookTime}>{item.cookTime}</Text>
       </View>
     </TouchableOpacity>
@@ -129,6 +162,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   recipeContent: {
     flex: 1,
@@ -139,14 +174,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
   },
-  recipeDescription: {
-    color: '#999',
+  recipeAuthor: {
+    color: '#888',
     fontSize: 14,
     marginBottom: 4,
   },
   cookTime: {
     color: '#666',
     fontSize: 12,
+  },
+  recipeImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
   },
 });
 

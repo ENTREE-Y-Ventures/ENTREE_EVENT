@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -6,14 +6,10 @@ import {
   View,
   FlatList,
 } from 'react-native';
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RecipeCard from '../components/RecipeCard';
 
-
-const Home = ({navigation}) => {
-
+const Home = () => {
   const dinnerRecipes = [
     {
       id: 1,
@@ -74,35 +70,39 @@ const Home = ({navigation}) => {
     },
   ];
 
-  function Section({children, title}) {
+  const Section = ({children, title}) => {
     return (
       <View style={styles.sectionContainer}>
-        <Text style={[styles.sectionTitle, {color: Colors.white,},]}>{title}</Text>
+        <Text style={[styles.sectionTitle, {color: Colors.white}]}>{title}</Text>
       </View>
     );
-  }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/*<Text onPress={() => navigation.navigate('Recipe')}>Go to Recipe</Text>*/}
       <Section title={'Top 3 Christmas\nDinner Recipes'} />
       <FlatList
         data={dinnerRecipes}
-        renderItem={({ item }) => <RecipeCard recipe={item} navigation={navigation} />}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.recipeList}
+        renderItem={({ item }) => (
+          <RecipeCard recipe={item} />
+        )}
+        keyExtractor={item => item.id.toString()}
         horizontal={true}
       />
 
       <Section title={'Top 3 Christmas\nDessert Recipes'} />
       <FlatList
         data={dessertRecipes}
-        renderItem={({ item }) => <RecipeCard recipe={item} />}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <RecipeCard 
+            recipe={item}
+            key={item.id}
+          />
+        )}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.recipeList}
         horizontal={true}
       />
-
     </ScrollView>
   );
 };
@@ -112,11 +112,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     paddingHorizontal: 14,
-    // paddingTop: StatusBar.currentHeight || 0,
   },
   sectionContainer: {
     marginTop: 16,
-    // paddingHorizontal: 12,
     marginBottom: 8,
   },
   sectionTitle: {
@@ -125,7 +123,6 @@ const styles = StyleSheet.create({
   },
   recipeList: {
     paddingBottom: 14,
-    // backgroundColor: 'lightblue',
   },
 });
 

@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import realm, { addScrap, deleteScrap } from '../../database/RealmDatabase';
+import { useNavigation } from '@react-navigation/native';
 
 
-const RecipeCard = ({ navigation, recipe }) => {
+const RecipeCard = ({ recipe }) => {
+  const navigation = useNavigation();
   const ScrapIcon = require('../assets/scrap_icon.png');
   const [isScrapped, setIsScrapped] = useState(false);
 
