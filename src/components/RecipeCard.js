@@ -21,11 +21,7 @@ const RecipeCard = memo(({ recipe }) => {
         onPress={() => navigation.navigate('Recipe', { recipeId: recipe.id })}
       >
         <Image source={recipe.image} style={styles.image} />
-      </TouchableOpacity>
       <View style={styles.infoContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Recipe', { recipeId: recipe.id })}
-        >
           <View style={styles.textContent}>
             <Text style={styles.title}>{recipe.title}</Text>
             <Text style={styles.author}>{recipe.author}</Text>
@@ -50,8 +46,8 @@ const RecipeCard = memo(({ recipe }) => {
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableOpacity>
       </View>
+      </TouchableOpacity>
     </View>
   );
 });

@@ -11,7 +11,6 @@ import {
 import { useScrap } from '../components/ScrapContext';
 
 const SearchIcon = require('../assets/search_icon.png');
-const ScrapTabIcon = require('../assets/scrap_icon.png');
 
 // Home.js의 레시피 데이터를 가져옵니다
 const allRecipes = [

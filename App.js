@@ -159,7 +159,7 @@ const TabNavigator = () => (
 
 const App = () => {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={styles.safeArea}>
       <ScrapProvider>
         <NavigationContainer>
           <TabNavigator />
