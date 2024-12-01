@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,55 +8,75 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import realm, {deleteScrap, getAllScraps, logRealmData} from '../../database/RealmDatabase';
+import { useScrap } from '../components/ScrapContext';
 
 const SearchIcon = require('../assets/search_icon.png');
 const ScrapTabIcon = require('../assets/scrap_icon.png');
 
+// Home.js의 레시피 데이터를 가져옵니다
+const allRecipes = [
+  {
+    id: 1,
+    title: 'Spaghetti Carbonara',
+    author: 'Ian Fisher',
+    image: require('../assets/Spaghetti_Carbonara.png'),
+    reviews: '12,897',
+    ratingScore: 5,
+    cookTime: '30 minutes',
+  },
+  {
+    id: 2,
+    title: 'Cast-Iron Steak',
+    author: 'Julia Moskin',
+    image: require('../assets/Cast-Iron_Steak.png'),
+    reviews: '5,556',
+    ratingScore: 5,
+    cookTime: '1 hour',
+  },
+  {
+    id: 3,
+    title: 'Ratatouille',
+    author: 'Melissa Clark',
+    image: require('../assets/Ratatouille.png'),
+    reviews: '3,110',
+    ratingScore: 5,
+    cookTime: '3 hour',
+  },
+  {
+    id: 1000,
+    title: 'Strawberry Pavlova',
+    author: 'Nigella Lawson',
+    image: require('../assets/Strawberry_Pavlova.png'),
+    reviews: '2,941',
+    ratingScore: 5,
+    cookTime: '2 hours',
+  },
+  {
+    id: 1001,
+    title: 'Peanut Butter Blossoms',
+    author: 'the Gerrero family',
+    image: require('../assets/Peanut_Butter_Blossoms.png'),
+    reviews: '6,913',
+    ratingScore: 5,
+    cookTime: '35 minutes',
+  },
+  {
+    id: 1002,
+    title: 'Magnolia Bakery\'s Cupcakes',
+    author: 'Susan Campos',
+    image: require('../assets/Magnolia_Bakerys_Cupcakes.png'),
+    reviews: '3,139',
+    ratingScore: 5,
+    cookTime: '45 minutes',
+  },
+];
 
-const Scrap = ({navigation}) => {
+const Scrap = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
-  const [scrappedRecipes, setScrappedRecipes] = useState([]);
+  const { scrappedRecipes: scrapIds, isScraped, toggleScrap } = useScrap();
 
-  // 스크랩 데이터를 로드하는 함수
-  const loadScrappedRecipes = () => {
-    const scraps = getAllScraps(); // Realm에서 모든 스크랩 데이터 로드
-    const formattedScraps = scraps.map((scrap) => ({
-      id: scrap.id,
-      title: scrap.title,
-      author: scrap.author,
-      cookTime: scrap.cookTime,
-      image: { uri: scrap.image },
-    }));
-    setScrappedRecipes(formattedScraps);
-  };
-
-  useEffect(() => {
-    // 처음 로드 시 데이터 로드
-    loadScrappedRecipes();
-    logRealmData(); // 데이터베이스 상태 로그 출력
-
-    // Realm Listener로 데이터 변경 감지
-    const scraps = realm.objects('Scrap');
-    const scrapListener = () => {
-      loadScrappedRecipes(); // 데이터 변경 시 새로 로드
-    };
-    scraps.addListener(scrapListener);
-
-    // 컴포넌트 언마운트 시 리스너 제거
-    return () => {
-      scraps.removeListener(scrapListener);
-    };
-  }, []);
-
-
-  const handleDeleteScrap = (recipeId) => {
-    deleteScrap(recipeId); // 스크랩 삭제
-  };
-
-  const renderStars = (rating) => {
-    return '★'.repeat(rating) + '☆'.repeat(5-rating);
-  };
+  // 스크랩된 레시피만 필터링
+  const scrappedRecipes = allRecipes.filter(recipe => isScraped(recipe.id));
 
   const renderRecipeCard = ({ item }) => (
     <TouchableOpacity
@@ -68,33 +88,24 @@ const Scrap = ({navigation}) => {
         <Text style={styles.recipeTitle}>{item.title}</Text>
         <Text style={styles.chefName}>{item.author}</Text>
         <View style={styles.ratingContainer}>
-          {/*<Text style={styles.rating}>{renderStars(item.rating)} </Text>*/}
           <Text style={styles.rating}>★★★★★</Text>
+          <Text style={styles.reviews}>{item.reviews}</Text>
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.cookTime}>{item.cookTime}</Text>
-          <TouchableOpacity
-            onPress={() => {
-              handleDeleteScrap(item.id); // 삭제 후 갱신
-            }}
-          >
-            <Image
-              source={ScrapTabIcon}
-              style={styles.bookmarkIcon}
-            />
-          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
   );
 
+  const filteredRecipes = scrappedRecipes.filter(recipe =>
+    recipe.title.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Image
-          source={SearchIcon}
-          style={styles.searchIcon}
-        />
+        <Image source={SearchIcon} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="스크랩한 레시피를 검색해보세요!"
@@ -105,9 +116,9 @@ const Scrap = ({navigation}) => {
       </View>
       <FlatList
         key={'two-column'}
-        data={scrappedRecipes.filter(recipe => recipe.title.toLowerCase().includes(searchText.toLowerCase()))}
+        data={filteredRecipes}
         renderItem={renderRecipeCard}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
@@ -151,7 +162,6 @@ const styles = StyleSheet.create({
   },
   recipeCard: {
     backgroundColor: '#1E1E1E',
-    borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
     width: '48%',
@@ -202,11 +212,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 4,
-  },
-  bookmarkIcon: {
-    width: 15,
-    height: 22,
-    tintColor: '#FD802D',
   },
   emptyContainer: {
     flex: 1,

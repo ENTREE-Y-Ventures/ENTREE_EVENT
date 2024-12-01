@@ -17,13 +17,13 @@ const RecipeCard = memo(({ recipe }) => {
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={() => navigation.navigate('Recipe', { recipeId: recipe.id })}
       >
         <Image source={recipe.image} style={styles.image} />
       </TouchableOpacity>
       <View style={styles.infoContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => navigation.navigate('Recipe', { recipeId: recipe.id })}
         >
           <View style={styles.textContent}>
@@ -116,6 +116,11 @@ const styles = StyleSheet.create({
   cookTime: {
     fontSize: 12,
     color: '#FFFFFF',
+  },
+  bookmarkContainer: {
+    alignItems: 'flex-end',
+    paddingRight: 8,
+    marginTop: 'auto',
   },
   bookmarkButton: {
     padding: 2,
