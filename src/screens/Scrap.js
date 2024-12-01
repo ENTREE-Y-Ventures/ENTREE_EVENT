@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,66 +8,74 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import realm, {deleteScrap, getAllScraps, logRealmData} from '../../database/RealmDatabase';
 
 const SearchIcon = require('../assets/search_icon.png');
 const ScrapTabIcon = require('../assets/scrap_icon.png');
 
-// 임시 스크랩 데이터
-const scrappedRecipes = [
-  {
-    id: '1',
-    title: '까르보나라',
-    chef: 'Ian Fisher',
-    cookTime: '30 minutes',
-    rating: 5,
-    reviews: 12897,
-    imageUrl: require('../assets/recipe/carbonara.png'),
-  },
-  {
-    id: '3',
-    title: '라따뚜이',
-    chef: 'Melissa Clark',
-    cookTime: '3 hours',
-    rating: 5,
-    reviews: 3112,
-    imageUrl: require('../assets/recipe/ratatouille.png'),
-  },
-  {
-    id: '4',
-    title: '컵케이크',
-    chef: 'Nigella Lawson',
-    cookTime: '2 hours',
-    rating: 5,
-    reviews: 2941,
-    imageUrl: require('../assets/recipe/cupcake.png'),
-  },
-];
 
 const Scrap = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
+  const [scrappedRecipes, setScrappedRecipes] = useState([]);
+
+  // 스크랩 데이터를 로드하는 함수
+  const loadScrappedRecipes = () => {
+    const scraps = getAllScraps(); // Realm에서 모든 스크랩 데이터 로드
+    const formattedScraps = scraps.map((scrap) => ({
+      id: scrap.id,
+      title: scrap.title,
+      author: scrap.author,
+      cookTime: scrap.cookTime,
+      image: { uri: scrap.image },
+    }));
+    setScrappedRecipes(formattedScraps);
+  };
+
+  useEffect(() => {
+    // 처음 로드 시 데이터 로드
+    loadScrappedRecipes();
+    logRealmData(); // 데이터베이스 상태 로그 출력
+
+    // Realm Listener로 데이터 변경 감지
+    const scraps = realm.objects('Scrap');
+    const scrapListener = () => {
+      loadScrappedRecipes(); // 데이터 변경 시 새로 로드
+    };
+    scraps.addListener(scrapListener);
+
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+      scraps.removeListener(scrapListener);
+    };
+  }, []);
+
+
+  const handleDeleteScrap = (recipeId) => {
+    deleteScrap(recipeId); // 스크랩 삭제
+  };
 
   const renderStars = (rating) => {
     return '★'.repeat(rating) + '☆'.repeat(5-rating);
   };
 
   const renderRecipeCard = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.recipeCard}
       onPress={() => navigation.navigate('Recipe', { recipeId: item.id })}
     >
-      <Image source={item.imageUrl} style={styles.recipeImage} />
+      <Image source={item.image} style={styles.recipeImage} />
       <View style={styles.recipeInfo}>
         <Text style={styles.recipeTitle}>{item.title}</Text>
-        <Text style={styles.chefName}>{item.chef}</Text>
+        <Text style={styles.chefName}>{item.author}</Text>
         <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>{renderStars(item.rating)} </Text>
-          <Text style={styles.reviews}>{item.reviews.toLocaleString()}</Text>
+          {/*<Text style={styles.rating}>{renderStars(item.rating)} </Text>*/}
+          <Text style={styles.rating}>★★★★★</Text>
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.cookTime}>{item.cookTime}</Text>
           <TouchableOpacity
             onPress={() => {
-              // 북마크 토글 기능 구현
+              handleDeleteScrap(item.id); // 삭제 후 갱신
             }}
           >
             <Image
@@ -97,12 +105,17 @@ const Scrap = ({navigation}) => {
       </View>
       <FlatList
         key={'two-column'}
-        data={scrappedRecipes}
+        data={scrappedRecipes.filter(recipe => recipe.title.toLowerCase().includes(searchText.toLowerCase()))}
         renderItem={renderRecipeCard}
         keyExtractor={item => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>스크랩한 레시피가 없습니다.</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -194,6 +207,17 @@ const styles = StyleSheet.create({
     width: 15,
     height: 22,
     tintColor: '#FD802D',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  emptyText: {
+    color: '#999999',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

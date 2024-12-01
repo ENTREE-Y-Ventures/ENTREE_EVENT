@@ -45,7 +45,7 @@ const Search = ({navigation}) => {
 
   useEffect(() => {
     if (searchText) {
-      const filtered = recipeData.filter(recipe => 
+      const filtered = recipeData.filter(recipe =>
         recipe.title.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredRecipes(filtered);
@@ -82,7 +82,7 @@ const Search = ({navigation}) => {
           onChangeText={setSearchText}
         />
       </View>
-      
+
       <FlatList
         data={filteredRecipes}
         renderItem={renderRecipeItem}
