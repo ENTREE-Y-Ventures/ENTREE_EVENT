@@ -8,7 +8,6 @@ import Home from './src/screens/Home';
 import Scrap from './src/screens/Scrap';
 import Search from './src/screens/Search';
 import Recipe from './src/screens/Recipe';
-import { addScrap, deleteScrap, getAllScraps } from './database/RealmDatabase';
 import { ScrapProvider } from './src/components/ScrapContext';
 
 const Stack = createStackNavigator();

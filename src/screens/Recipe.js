@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useScrap } from '../components/ScrapContext';
+import Feather from 'react-native-vector-icons/Feather';
 
 const ScrapTabIcon = require('../assets/scrap_icon.png');
 
@@ -167,6 +168,21 @@ const Recipe = ({ route, navigation }) => {
   const { isScraped, toggleScrap } = useScrap();
   const isBookmarked = isScraped(recipeId);
 
+  const [activeTab, setActiveTab] = useState('조리 방법');
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNextStep = () => {
+    if (currentStep < recipeData.preparation.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -218,13 +234,71 @@ const Recipe = ({ route, navigation }) => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>조리 방법</Text>
-        {recipeData.preparation.map((step, index) => (
-          <View key={index} style={styles.stepContainer}>
-            <Text style={styles.stepNumber}>Step {index + 1}</Text>
-            <Text style={styles.stepText}>{step}</Text>
+        <View style={styles.tabSection}>
+          <TouchableOpacity onPress={() => setActiveTab('조리 방법')}>
+        {/*<Text style={styles.tabSectionTitle}>조리 방법</Text>*/}
+            <Text
+              style={[
+                styles.tabSectionTitle,
+                activeTab === '조리 방법' && styles.activeTab,
+              ]}
+            >
+              조리 방법
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setActiveTab('단계별 조리')}>
+          {/*<Text style={styles.tabSectionTitle}>단계별 조리</Text>*/}
+            <Text
+              style={[
+                styles.tabSectionTitle,
+                activeTab === '단계별 조리' && styles.activeTab,
+              ]}
+            >
+              단계별 조리
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {activeTab === '조리 방법' ? (
+          recipeData.preparation.map((step, index) => (
+            <View key={index} style={styles.stepContainer}>
+              <Text style={styles.stepNumber}>Step {index + 1}</Text>
+              <Text style={styles.stepText}>{step}</Text>
+            </View>
+          ))
+        ) : (
+          <View style={styles.voiceStepContainer}>
+            <Text style={styles.stepNumber}>Step {currentStep + 1}</Text>
+            <Text style={styles.stepText}>
+              {recipeData.preparation[currentStep]}
+            </Text>
+
+            <View style={styles.navigationButtons}>
+              <TouchableOpacity
+                onPress={handlePreviousStep}
+                disabled={currentStep === 0}
+                style={[
+                  styles.navButton,
+                  currentStep === 0 && styles.disabledButton,
+                ]}
+              >
+                {/*<Text style={styles.navButtonText}>이전</Text>*/}
+                <Feather name="chevron-left" size={24} style={styles.navButtonText} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleNextStep}
+                disabled={currentStep === recipeData.preparation.length - 1}
+                style={[
+                  styles.navButton,
+                  currentStep === recipeData.preparation.length - 1 &&
+                  styles.disabledButton,
+                ]}
+              >
+                {/*<Text style={styles.navButtonText}>다음</Text>*/}
+                <Feather name="chevron-right" size={24} style={styles.navButtonText} />
+              </TouchableOpacity>
+            </View>
           </View>
-        ))}
+        )}
       </View>
     </ScrollView>
   );
@@ -264,6 +338,24 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#333333',
   },
+  tabSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tabSectionTitle: {
+    backgroundColor: '#242225',
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    marginRight: 10,
+  },
+  activeTab: {
+    backgroundColor: '#FD802D',
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -277,6 +369,13 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     marginBottom: 16,
+  },
+  voiceStepContainer: {
+    marginBottom: 16,
+    backgroundColor: '#242225',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 12,
   },
   stepNumber: {
     fontSize: 16,
@@ -293,6 +392,24 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     backgroundColor: '#121212',
+  },
+  navigationButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  navButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#FD802D',
+    borderRadius: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#555555',
+  },
+  navButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
   },
 });
 
