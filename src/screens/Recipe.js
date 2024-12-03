@@ -281,8 +281,8 @@ const Recipe = ({ route, navigation }) => {
                   currentStep === 0 && styles.disabledButton,
                 ]}
               >
-                {/*<Text style={styles.navButtonText}>이전</Text>*/}
-                <Feather name="chevron-left" size={24} style={styles.navButtonText} />
+                <Text style={styles.navButtonText}>이전</Text>
+                {/*<Feather name="chevron-left" size={24} style={styles.navButtonText} />*/}
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleNextStep}
@@ -293,8 +293,8 @@ const Recipe = ({ route, navigation }) => {
                   styles.disabledButton,
                 ]}
               >
-                {/*<Text style={styles.navButtonText}>다음</Text>*/}
-                <Feather name="chevron-right" size={24} style={styles.navButtonText} />
+                <Text style={styles.navButtonText}>다음</Text>
+                {/*<Feather name="chevron-right" size={24} style={styles.navButtonText} />*/}
               </TouchableOpacity>
             </View>
           </View>
