@@ -23,6 +23,11 @@ target 'Entree_Event' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+#   # 권한 설정 추가
+#   permissions_path = '../node_modules/react-native-permissions/ios'
+#   # Microphone 권한 추가
+#   pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+
   target 'Entree_EventTests' do
     inherit! :complete
     # Pods for testing
