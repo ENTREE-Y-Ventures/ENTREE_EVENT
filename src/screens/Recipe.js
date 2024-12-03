@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useScrap } from '../components/ScrapContext';
 import Feather from 'react-native-vector-icons/Feather';
+import Voice from '@react-native-voice/voice';
 
 const ScrapTabIcon = require('../assets/scrap_icon.png');
 
@@ -170,6 +171,69 @@ const Recipe = ({ route, navigation }) => {
 
   const [activeTab, setActiveTab] = useState('조리 방법');
   const [currentStep, setCurrentStep] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+
+  useEffect(() => {
+    Voice.onSpeechResults = onSpeechResults; //음성 인식 리스너
+
+    const startVoiceRecognition = () => {
+      console.log("탭 포커스됨");
+      if (activeTab === '단계별 조리') {
+        startListening(); // 음성 인식 시작
+        console.log("음성 인식 시작");
+      }
+    };
+
+    const stopVoiceRecognition = () => {
+      console.log("탭 포커스 해제됨");
+      stopListening(); // 음성 인식 중지
+      console.log("음성 인식 종료");
+    };
+
+    // 네비게이션 이벤트 등록
+    const focusListener = navigation.addListener('focus', startVoiceRecognition);
+    const blurListener = navigation.addListener('blur', stopVoiceRecognition);
+
+    return () => {
+      // 이벤트 리스너 정리
+      focusListener();
+      blurListener();
+    };
+  }, [navigation, activeTab]);
+
+  // 음성 인식 상태 확인용 코드
+  useEffect(() => {
+    console.log("isListening 상태:", isListening);
+  }, [isListening]);
+
+  const startListening = async () => {
+    try {
+      console.log("음성 인식 시작 호출");
+      setIsListening(true);
+      await Voice.start('ko-KR'); // 한국어로 음성 인식 시작
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      setIsListening(false);
+      await Voice.stop(); // 음성 인식 중지
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSpeechResults = (event) => {
+    const speech = event.value[0]?.toLowerCase();
+
+    if (speech.includes('다음')) {
+      handleNextStep();
+    } else if (speech.includes('이전')) {
+      handlePreviousStep();
+    }
+  };
 
   const handleNextStep = () => {
     if (currentStep < recipeData.preparation.length - 1) {
@@ -284,6 +348,14 @@ const Recipe = ({ route, navigation }) => {
                 <Text style={styles.navButtonText}>이전</Text>
                 {/*<Feather name="chevron-left" size={24} style={styles.navButtonText} />*/}
               </TouchableOpacity>
+
+              {/* 듣는 중 메시지 */}
+              {isListening && (
+                <View style={styles.listeningStatus}>
+                  <Text style={styles.listeningText}>듣는 중...</Text>
+                </View>
+              )}
+
               <TouchableOpacity
                 onPress={handleNextStep}
                 disabled={currentStep === recipeData.preparation.length - 1}
@@ -396,6 +468,7 @@ const styles = StyleSheet.create({
   navigationButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 16,
   },
   navButton: {
@@ -408,6 +481,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#555555',
   },
   navButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  listeningStatus: {
+    marginHorizontal: 16, // 버튼 사이 여백
+    alignItems: 'center',
+  },
+  listeningText: {
     fontSize: 16,
     color: '#FFFFFF',
   },

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   View,
-  FlatList,
+  FlatList, Platform, PermissionsAndroid,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RecipeCard from '../components/RecipeCard';
@@ -70,6 +70,48 @@ const Home = () => {
     },
   ];
 
+  // 권한 요청 함수
+  const requestPermissions = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: '음성 인식 권한',
+            message: '이 앱은 음성 인식을 위해 마이크 권한이 필요합니다.',
+            buttonNeutral: '나중에',
+            buttonNegative: '취소',
+            buttonPositive: '확인',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('마이크 권한 허용됨');
+          return true; // 권한 허용
+        } else {
+          console.log('마이크 권한 거부됨');
+          return false; // 권한 거부
+        }
+      } catch (err) {
+        console.warn(err);
+        return false; // 오류 발생 시 거부로 간주
+      }
+    } else {
+      console.log('아이폰 마이크 권한 기본 허용됨');
+      return true; // iOS의 경우 별도의 처리가 없으므로 기본적으로 허용
+    }
+  };
+
+  // 컴포넌트 마운트 시 권한 요청
+  useEffect(() => {
+    requestPermissions().then((result) => {
+      if (result) {
+        console.log('마이크 권한 요청 완료:', result);
+      } else {
+        console.log('마이크 권한 요청 실패 또는 거부');
+      }
+    });
+  }, []);
+
   const Section = ({children, title}) => {
     return (
       <View style={styles.sectionContainer}>
@@ -95,7 +137,7 @@ const Home = () => {
       <FlatList
         data={dessertRecipes}
         renderItem={({ item }) => (
-          <RecipeCard 
+          <RecipeCard
             recipe={item}
             key={item.id}
           />
