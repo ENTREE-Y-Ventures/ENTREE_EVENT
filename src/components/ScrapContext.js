@@ -34,9 +34,10 @@ export const ScrapProvider = ({ children }) => {
 
     const toggleScrap = async (recipeId) => {
         setScrappedRecipes(prev => {
-            const newScraps = prev.includes(recipeId)
-                ? prev.filter(id => id !== recipeId)
-                : [...prev, recipeId];
+            const now = new Date().toISOString();
+            const newScraps = prev.some(scrap => scrap.id === recipeId)
+                ? prev.filter(scrap => scrap.id !== recipeId)
+                : [...prev, { id: recipeId, createdAt: now }];
 
             // 상태 변경 후 AsyncStorage에 저장
             saveScrappedRecipes(newScraps);
@@ -48,7 +49,7 @@ export const ScrapProvider = ({ children }) => {
         <ScrapContext.Provider value={{
             scrappedRecipes,
             toggleScrap,
-            isScraped: (id) => scrappedRecipes.includes(id)
+            isScraped: (id) => scrappedRecipes.some(scrap => scrap.id === id)
         }}>
             {children}
         </ScrapContext.Provider>

@@ -11,6 +11,7 @@ import {
 import { useScrap } from '../components/ScrapContext';
 
 const SearchIcon = require('../assets/search_icon.png');
+const ScrapTabIcon = require('../assets/scrap_icon.png');
 
 // Home.js의 레시피 데이터를 가져옵니다
 const allRecipes = [
@@ -74,8 +75,14 @@ const Scrap = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const { scrappedRecipes: scrapIds, isScraped, toggleScrap } = useScrap();
 
-  // 스크랩된 레시피만 필터링
-  const scrappedRecipes = allRecipes.filter(recipe => isScraped(recipe.id));
+  // 스크랩된 레시피만 필터링하고 createdAt 기준으로 정렬
+  const scrappedRecipes = allRecipes
+    .filter(recipe => isScraped(recipe.id))
+    .sort((a, b) => {
+      const aScrap = scrapIds.find(scrap => scrap.id === a.id);
+      const bScrap = scrapIds.find(scrap => scrap.id === b.id);
+      return new Date(bScrap.createdAt) - new Date(aScrap.createdAt);
+    });
 
   const renderRecipeCard = ({ item }) => (
     <TouchableOpacity
@@ -92,6 +99,22 @@ const Scrap = ({ navigation }) => {
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.cookTime}>{item.cookTime}</Text>
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleScrap(item.id);
+            }}
+            style={styles.bookmarkButton}
+          >
+            <Image
+              source={ScrapTabIcon}
+              style={{
+                width: 15,
+                height: 22,
+                tintColor: isScraped(item.id) ? '#FD802D' : '#878787'
+              }}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -174,15 +197,17 @@ const styles = StyleSheet.create({
     padding: 12.1,
   },
   recipeTitle: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 4,
+    color: '#FFFFFF',
+    marginBottom: 2,
+    flexWrap: 'wrap',
   },
   chefName: {
-    color: '#999999',
-    fontSize: 12,
-    marginBottom: 6,
+    fontSize: 13.5,
+    color: '#FFFFFF',
+    fontWeight: 400,
+    marginBottom: 8,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -190,17 +215,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   rating: {
-    color: '#FFB800',
-    fontSize: 14,
-    marginRight: 6,
+    color: '#FFD700',
+    fontSize: 12,
+    marginRight: 8,
   },
   reviews: {
-    color: '#999999',
     fontSize: 12,
+    color: '#FFFFFF',
   },
   cookTime: {
-    color: '#999999',
     fontSize: 12,
+    color: '#FFFFFF',
   },
   row: {
     flex: 1,
@@ -210,7 +235,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 4,
+    paddingRight: 4,
+  },
+  bookmarkButton: {
+    padding: 2,
+    marginRight: -4,
   },
   emptyContainer: {
     flex: 1,
