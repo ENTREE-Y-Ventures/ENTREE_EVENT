@@ -184,6 +184,13 @@ const CookingSteps = ({ route }) => {
                     </View>
                 ))}
             </ScrollView>
+            
+            {/* 문의 아이콘 추가 */}
+            <Image 
+                source={require('../assets/문의아이콘.png')}
+                style={styles.inquiryIcon}
+                resizeMode="contain"
+            />
         </View>
     );
 };
@@ -297,6 +304,14 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         backgroundColor: '#2A2A2A',
         resizeMode: 'contain',
+    },
+    inquiryIcon: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 50,
+        height: 50,
+        zIndex: 999,
     },
 });
 
