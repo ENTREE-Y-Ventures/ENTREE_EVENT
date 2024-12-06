@@ -126,6 +126,7 @@ const CookingSteps = ({ route }) => {
             <ScrollView
                 ref={stepsScrollViewRef}
                 style={styles.stepsContainer}
+                scrollEnabled={false} // 스크롤 비활성화
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
             >
@@ -139,8 +140,8 @@ const CookingSteps = ({ route }) => {
                         onLayout={(event) => handleStepLayout(index, event)}
                     >
                         <Text style={styles.stepTime}>
-                            {index === 0 ? "6:45" : 
-                             index === 1 ? "16:27" : 
+                            {index === 0 ? "6:45" :
+                             index === 1 ? "16:27" :
                              index === 2 ? "25:15" :
                              index === 3 ? "31:20" : "34:18"}
                         </Text>
@@ -159,7 +160,7 @@ const CookingSteps = ({ route }) => {
                             ]}>
                                 Step {index + 1}
                             </Text>
-                            
+
                             {/* 아이콘 추가 */}
                             {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][index + 1] && (
                                 <View style={styles.iconsContainer}>
@@ -184,9 +185,9 @@ const CookingSteps = ({ route }) => {
                     </View>
                 ))}
             </ScrollView>
-            
+
             {/* 문의 아이콘 추가 */}
-            <Image 
+            <Image
                 source={require('../assets/문의아이콘.png')}
                 style={styles.inquiryIcon}
                 resizeMode="contain"

@@ -207,35 +207,14 @@ const TabNavigator = () => (
 const App = () => {
 
   // 마이크 권한 요청 함수
-  const requestPermissions = async () => {
-    if (Platform.OS === 'android') {
+  const requestMicrophonePermission = async () => {
+    if (Platform.OS === 'ios') {
       try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          {
-            title: '음성 인식 권한',
-            message: '이 앱은 음성 인식을 위해 마이크 권한이 필요합니다.',
-            buttonNeutral: '나중에',
-            buttonNegative: '취소',
-            buttonPositive: '확인',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('안드로이드 마이크 권한 허용됨');
-          return true;
-        } else {
-          console.log('안드로이드 마이크 권한 거부됨');
-          return false;
-        }
-      } catch (err) {
-        console.warn('안드로이드 권한 요청 중 오류:', err);
-        return false;
-      }
-    } else if (Platform.OS === 'ios') {
-      try {
+        // iOS 마이크 권한 확인 및 요청
         const microphonePermission = await check(PERMISSIONS.IOS.MICROPHONE);
 
-        if (microphonePermission === RESULTS.DENIED || microphonePermission === RESULTS.LIMITED) {
+        if (microphonePermission === RESULTS.DENIED) {
+          console.log('iOS 마이크 권한 없음, 요청 중...');
           const newPermission = await request(PERMISSIONS.IOS.MICROPHONE);
           if (newPermission === RESULTS.GRANTED) {
             console.log('iOS 마이크 권한 허용됨');
@@ -252,18 +231,86 @@ const App = () => {
           return false;
         }
       } catch (err) {
-        console.warn('iOS 권한 요청 중 오류:', err);
+        console.warn('iOS 마이크 권한 요청 중 오류:', err);
+        return false;
+      }
+    } else if (Platform.OS === 'android' && Platform.Version >= 23) {
+      try {
+        // Android 마이크 권한 요청
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: '마이크 권한 요청',
+            message: '이 앱은 음성 인식을 위해 마이크 권한이 필요합니다.',
+            buttonNeutral: '나중에 묻기',
+            buttonNegative: '거부',
+            buttonPositive: '허용',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Android 마이크 권한 허용됨');
+          return true;
+        } else {
+          console.log('Android 마이크 권한 거부됨');
+          return false;
+        }
+      } catch (err) {
+        console.warn('Android 마이크 권한 요청 중 오류:', err);
         return false;
       }
     } else {
-      console.warn('지원되지 않는 플랫폼입니다.');
-      return false;
+      console.log('마이크 권한이 필요 없는 플랫폼 또는 버전');
+      return true; // iOS < 10 또는 Android < 6.0
     }
   };
 
+
+
+  // const requestMicrophonePermission = async () => {
+  //   if (Platform.OS === 'ios') {
+  //     let microphonePermission = await check(
+  //       PERMISSIONS.IOS.MICROPHONE,
+  //     );
+  //
+  //     if (microphonePermission === RESULTS.DENIED) {
+  //       const newPermission = await request(
+  //         PERMISSIONS.IOS.MICROPHONE,
+  //       );
+  //       return newPermission === RESULTS.GRANTED;
+  //     }
+  //
+  //     return microphonePermission === RESULTS.GRANTED;
+  //   } else if (Platform.OS === 'android' && Platform.Version >= 23) {
+  //     try {
+  //       const granted = await PermissionsAndroid.request(
+  //         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+  //         {
+  //           title: '위치 서비스 권한',
+  //           message:
+  //             '이 앱은 음성 인식을 위해 마이크 권한이 필요합니다.',
+  //           buttonNeutral: '나중에 묻기',
+  //           buttonNegative: '거부',
+  //           buttonPositive: '허용',
+  //         },
+  //       );
+  //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //         console.log('안드로이드 마이크 권한 획득');
+  //       } else {
+  //         console.log('안드로이드 마이크 권한 거부');
+  //       }
+  //       return granted === PermissionsAndroid.RESULTS.GRANTED;
+  //     } catch (err) {
+  //       console.warn(err);
+  //       return false;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // };
+
   // 컴포넌트 마운트 시 권한 요청
   useEffect(() => {
-    requestPermissions().then((result) => {
+    requestMicrophonePermission().then((result) => {
       if (result) {
         console.log('마이크 권한 요청 완료:', result);
       } else {

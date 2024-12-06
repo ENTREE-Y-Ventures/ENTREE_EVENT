@@ -1,9 +1,16 @@
-# Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+# Transform this into a `node_require` generic function:
+def node_require(script)
+  # Resolve script with node to allow for hoisting
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve(
+      '#{script}',
+      {paths: [process.argv[1]]},
+    )", __dir__]).strip
+end
+
+# Use it to require both react-native's and this package's scripts:
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-permissions/scripts/setup.rb')
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
@@ -23,10 +30,10 @@ target 'Entree_Event' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-#   # 권한 설정 추가
-#   permissions_path = '../node_modules/react-native-permissions/ios'
-#   # Microphone 권한 추가
-#   pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+  # Microphone 권한 설정
+  setup_permissions([
+    'Microphone', # 필요한 권한 설정 추가
+  ])
 
   target 'Entree_EventTests' do
     inherit! :complete

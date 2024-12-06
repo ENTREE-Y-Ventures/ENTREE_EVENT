@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -220,91 +220,144 @@ const ingredientLinks = {
 
 const Recipe = ({ route, navigation }) => {
   const { recipeId } = route.params || {};
-  
+
   // 디버깅 로그 추가
   console.log('Route Params:', route.params);
   console.log('Recipe ID from params:', recipeId);
-  
+
   const { isScraped, toggleScrap } = useScrap();
   const isBookmarked = isScraped(recipeId);
 
   const [activeTab, setActiveTab] = useState('조리 방법');
   const [currentStep, setCurrentStep] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const isProcessing = useRef(false); // 이벤트 처리 중인지 여부
+
+  const handleNextStep = useCallback(() => {
+    setCurrentStep((prevStep) => {
+      const maxStep = recipesDetailData[recipeId].preparation.length - 1;
+      if (prevStep < maxStep) {
+        console.log("다음 버튼 실행", prevStep + 1);
+        return prevStep + 1;
+      }
+      return prevStep; // Max step reached
+    });
+  }, [recipeId]);
+
+  const handlePreviousStep = useCallback(() => {
+    setCurrentStep((prevStep) => {
+      if (prevStep > 0) {
+        console.log("이전 버튼 실행", prevStep - 1);
+        return prevStep - 1;
+      }
+      return prevStep; // Min step reached
+    });
+  }, []);
+
+  const onSpeechResults = useCallback(
+    async (event) => {
+      const speech = event.value[0]?.toLowerCase();
+      console.log("음성 인식 텍스트 :", speech);
+
+      // 중복 처리 방지
+      if (isProcessing.current) {
+        console.log("명령어 처리 중, 새 명령 무시:", speech);
+        return;
+      }
+
+      isProcessing.current = true; // 플래그 설정
+
+      // 텍스트에서 마지막 단어 추출
+      const lastWord = speech.split(" ").pop(); // 마지막 단어 추출
+      console.log("처리할 마지막 단어:", lastWord);
+
+      // 마지막 단어로 명령 처리
+      if (lastWord.includes("이전") || lastWord.includes("이전 단계")) {
+        handlePreviousStep();
+      } else if (lastWord.includes("다음") || lastWord.includes("다음 단계")) {
+        handleNextStep();
+      }
+
+      // 플래그 해제 및 쿨타임 설정
+      setTimeout(() => {
+        isProcessing.current = false;
+        console.log("처리 플래그 해제 완료");
+      }, 1000); // 1초 쿨타임
+    },
+    [handleNextStep, handlePreviousStep]
+  );
 
   useEffect(() => {
-    Voice.onSpeechResults = onSpeechResults; //음성 인식 리스너
-
-    const startVoiceRecognition = () => {
-      console.log("탭 포커스됨");
-      if (activeTab === '단계별 조리') {
-        startListening(); // 음성 인식 시작
-        console.log("음성 인식 시작");
-      }
+    const handleSpeechStart = () => {
+      console.log("음성 리스너 시작");
+      setIsListening(true); // 음성 리스너 시작 시 상태 업데이트
     };
 
-    const stopVoiceRecognition = () => {
-      console.log("탭 포커스 해제됨");
-      stopListening(); // 음성 인식 중지
-      console.log("음성 인식 종료");
+    const handleSpeechEnd = () => {
+      console.log("음성 리스너 종료");
+      // 음성 인식 종료 시 상태 업데이트 제거
+      setIsListening(false);
     };
 
-    // 네비게이션 이벤트 등록
-    const focusListener = navigation.addListener('focus', startVoiceRecognition);
-    const blurListener = navigation.addListener('blur', stopVoiceRecognition);
+    const handleSpeechError = (error) => {
+      console.error("음성 인식 에러:", error);
+    };
+
+    Voice.onSpeechStart = handleSpeechStart;
+    Voice.onSpeechEnd = handleSpeechEnd;
+    Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechError = handleSpeechError;
+    Voice.onSpeechVolumeChanged = () => {}; // 빈 함수로 설정하여 경고 방지
 
     return () => {
-      // 이벤트 리스너 정리
-      focusListener();
-      blurListener();
+      Voice.destroy().then(() => console.log("Voice 리스너 해제 완료"));
     };
-  }, [navigation, activeTab]);
+  }, [onSpeechResults]);
+
+
+  const startListening = async () => {
+    if (isListening) {
+      console.log("이미 음성 인식 실행 중입니다.");
+      return;
+    }
+    try {
+      console.log("음성 인식 호출 시작");
+      await Voice.start("ko-KR");
+      setIsListening(true);
+      console.log("음성 인식 시작");
+    } catch (error) {
+      console.error("음성 인식 시작 실패:", error);
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      if (!isListening) return; // 실행 중이 아니면 중단 방지
+      console.log("음성 인식 중단 중...");
+      await Voice.stop(); // 음성 인식 중단
+      console.log("음성 인식 중단 완료");
+    } catch (error) {
+      console.error("음성 인식 중단 실패:", error);
+    }
+  };
 
   // 음성 인식 상태 확인용 코드
   useEffect(() => {
     console.log("isListening 상태:", isListening);
   }, [isListening]);
 
-  const startListening = async () => {
-    try {
-      console.log("음성 인식 시작 호출");
-      setIsListening(true);
-      await Voice.start('ko-KR'); // 한국어로 음성 인식 시작
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    // activeTab이 변경될 때 음성 인식 시작/중지
+    if (activeTab === '단계별 조리') {
+      console.log('탭 변경: 단계별 조리 -> 음성 인식 시작');
+      startListening();
+      setIsListening(true); // 단계별 조리일 때 항상 true로 설정
+    } else {
+      console.log('탭 변경: 조리 방법 -> 음성 인식 중단');
+      stopListening();
+      setIsListening(false); // 조리 방법 탭일 때 false로 설정
     }
-  };
-
-  const stopListening = async () => {
-    try {
-      setIsListening(false);
-      await Voice.stop(); // 음성 인식 중지
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const onSpeechResults = (event) => {
-    const speech = event.value[0]?.toLowerCase();
-
-    if (speech.includes('다음')) {
-      handleNextStep();
-    } else if (speech.includes('이전')) {
-      handlePreviousStep();
-    }
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < recipeData.preparation.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePreviousStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  }, [activeTab]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -346,7 +399,7 @@ const Recipe = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollContainer}>
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <Image
           source={recipeImages[recipeId]}
           style={styles.recipeImage}
@@ -428,18 +481,23 @@ const Recipe = ({ route, navigation }) => {
                 단계별 조리
               </Text>
             </TouchableOpacity>
+
+            {isListening && (
+                <Text style={styles.orderText}>명령어 : "이전", "다음"</Text>
+            )}
+
           </View>
           {activeTab === '조리 방법' ? (
             recipeData.preparation.map((step, index) => (
-              <View 
-                key={index} 
+              <View
+                key={index}
                 style={[
                   styles.stepContainer,
                   index === recipeData.preparation.length - 1 && { marginBottom: 80 }  // 마지막 스텝에만 마진 추가
                 ]}
               >
                 <Text style={styles.stepNumber}>Step {index + 1}</Text>
-                
+
                 {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][index + 1] && (
                   <View style={styles.iconsContainer}>
                     {carbonaraStepIcons['1'][index + 1].map((icon, iconIndex) => {
@@ -463,14 +521,14 @@ const Recipe = ({ route, navigation }) => {
                     })}
                   </View>
                 )}
-                
+
                 <Text style={styles.stepText}>{step}</Text>
               </View>
             ))
           ) : (
             <View style={styles.voiceStepContainer}>
               <Text style={styles.stepNumber}>Step {currentStep + 1}</Text>
-              
+
               {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][currentStep + 1] && (
                 <View style={styles.iconsContainer}>
                   {carbonaraStepIcons['1'][currentStep + 1].map((icon, index) => {
@@ -674,8 +732,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listeningText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#FFFFFF',
+  },
+  orderText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    marginLeft: 12,
   },
   cookButton: {
     position: 'absolute',
@@ -765,3 +828,4 @@ const styles = StyleSheet.create({
 });
 
 export default Recipe;
+
