@@ -6,6 +6,7 @@ import {
   View,
   Image,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { useScrap } from '../components/ScrapContext';
 import Feather from 'react-native-vector-icons/Feather';
@@ -205,6 +206,12 @@ const ingredientIcons = {
   '파슬리': require('../assets/carbonara/파슬리.png'),
 };
 
+// 재료 아이콘별 쿠팡 링크 매핑 수정
+const ingredientLinks = {
+  '베이컨': 'https://www.coupang.com/vp/products/7863433926?itemId=21463922944&vendorItemId=88518342003',
+  '스파게티': 'https://www.coupang.com/vp/products/6444836231?itemId=19492096&vendorItemId=85320856065&pickType=COU_PICK&q=%EC%8A%A4%ED%8C%8C%EA%B2%8C%ED%8B%B0%EB%A9%B4&itemsCount=35&searchId=7e9ff04d6d4747a286c907475cf8484e&rank=1&searchRank=1&isAddedCart=',
+};
+
 const Recipe = ({ route, navigation }) => {
   const { recipeId } = route.params || {};
   
@@ -323,6 +330,14 @@ const Recipe = ({ route, navigation }) => {
     );
   }
 
+  // Recipe 컴포넌트 내부에서 링크 처리 함수 추가
+  const handleIconPress = (ingredientKey) => {
+    const link = ingredientLinks[ingredientKey];
+    if (link) {
+      Linking.openURL(link);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollContainer}>
@@ -357,12 +372,16 @@ const Recipe = ({ route, navigation }) => {
                     {Object.entries(ingredientIcons).map(([key, icon]) => {
                       if (name.includes(key)) {
                         return (
-                          <Image
+                          <TouchableOpacity
                             key={key}
-                            source={icon}
-                            style={styles.ingredientIcon}
-                            resizeMode="contain"
-                          />
+                            onPress={() => handleIconPress(key)}
+                          >
+                            <Image
+                              source={icon}
+                              style={[styles.ingredientIcon, styles.clickableIcon]}
+                              resizeMode="contain"
+                            />
+                          </TouchableOpacity>
                         );
                       }
                       return null;
@@ -417,14 +436,25 @@ const Recipe = ({ route, navigation }) => {
                 
                 {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][index + 1] && (
                   <View style={styles.iconsContainer}>
-                    {carbonaraStepIcons['1'][index + 1].map((icon, iconIndex) => (
-                      <Image
-                        key={iconIndex}
-                        source={icon}
-                        style={styles.stepIcon}
-                        resizeMode="contain"
-                      />
-                    ))}
+                    {carbonaraStepIcons['1'][index + 1].map((icon, iconIndex) => {
+                      return Object.entries(ingredientIcons).map(([key, iconSrc]) => {
+                        if (icon === iconSrc) {
+                          return (
+                            <TouchableOpacity
+                              key={`step-${index}-icon-${iconIndex}-${key}`}
+                              onPress={() => handleIconPress(key)}
+                            >
+                              <Image
+                                source={icon}
+                                style={[styles.stepIcon, styles.clickableIcon]}
+                                resizeMode="contain"
+                              />
+                            </TouchableOpacity>
+                          );
+                        }
+                        return null;
+                      }).filter(Boolean);
+                    })}
                   </View>
                 )}
                 
@@ -437,14 +467,25 @@ const Recipe = ({ route, navigation }) => {
               
               {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][currentStep + 1] && (
                 <View style={styles.iconsContainer}>
-                  {carbonaraStepIcons['1'][currentStep + 1].map((icon, index) => (
-                    <Image
-                      key={index}
-                      source={icon}
-                      style={styles.stepIcon}
-                      resizeMode="contain"
-                    />
-                  ))}
+                  {carbonaraStepIcons['1'][currentStep + 1].map((icon, index) => {
+                    return Object.entries(ingredientIcons).map(([key, iconSrc]) => {
+                      if (icon === iconSrc) {
+                        return (
+                          <TouchableOpacity
+                            key={`current-step-${currentStep}-icon-${index}-${key}`}
+                            onPress={() => handleIconPress(key)}
+                          >
+                            <Image
+                              source={icon}
+                              style={[styles.stepIcon, styles.clickableIcon]}
+                              resizeMode="contain"
+                            />
+                          </TouchableOpacity>
+                        );
+                      }
+                      return null;
+                    }).filter(Boolean);
+                  })}
                 </View>
               )}
 
@@ -709,6 +750,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     marginLeft: 8,
+  },
+  clickableIcon: {
+    opacity: 1,
+    transform: [{scale: 1}],
+    // 터치 가능함을 나타내는 시각적 효과를 추가할 수 있습니다
   },
 });
 
