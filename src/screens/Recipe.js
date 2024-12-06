@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -25,31 +25,31 @@ const recipeImages = {
 // 레시피 상세 데이터
 const recipesDetailData = {
   '1': {
-    title: "Spaghetti Carbonara",
-    author: "By Ian Fisher",
-    time: "30 minutes",
+    title: "베이컨 까르보나라",
+    author: "서현마미",
+    time: "35분",
     rating: "5 ★★★★★ (12,897)",
     ingredients: [
       "스파게티 면 400g",
       "베이컨 200g",
       "달걀 2개",
+      "양파 1/2개",
       "파마산 치즈 1컵",
       "페코리노 치즈 1/2컵",
-      "후추 약간",
       "올리브오일 2큰술",
-      "소금 약간"
+      "파슬리 3꼬집"
     ],
     preparation: [
-      "큰 냄비에 물을 끓이고 소금을 넣어 스파게티를 삶습니다.",
-      "베이컨을 잘게 썰어 팬에 바삭하게 구워줍니다.",
-      "볼에 달걀, 파마산 치즈, 페코리노 치즈를 넣고 잘 섞어줍니다.",
-      "삶은 면을 베이컨이 있는 팬에 넣고 달걀 치즈 믹스를 부어 빠르게 섞어줍니다.",
-      "후추를 넣고 맛을 조절한 뒤 바로 서빙합니다."
+      "베이컨은 적당한 크기로 잘라서 준비하고, 양파는 얇게 슬라이스한다. 달걀은 노른자만 따로 분리해서 준비하고, 생파슬리가 있다면 잘게 다진다.",
+      "냄비에 1L의 물과 10g의 소금을 넣어서 팔팔 끓이다가 준비한 스파게티면을 넣고 8분~10분 동안 삶는다. 다 삶아지면 체에 밭쳐서 물기를 빼준다",
+      "달군 팬에 올리브유를 둘러주고, 베이컨과 양파를 볶으며 익힌다. 양파가 투명하게 익으면 생크림과 우유를 넣어서 같이 끓인다.",
+      "소스가 끓으면 면을 넣고 섞는다. 살짝 되직해지면 불을 끄고 달걀 노른자를 넣고 재빨리 저어서 뭉친 게 없도록 한다.",
+      "준비한 파마산 치즈가루와 파슬리를 넣고 섞어준 후, 그대로 그릇에 담는다."
     ]
   },
   '2': {
-    title: "Cast-Iron Steak",
-    author: "By Julia Moskin",
+    title: "포도소스 스테이크",
+    author: "줄리아의 레시피",
     time: "1 hour",
     rating: "5 ★★★★★ (5,556)",
     ingredients: [
@@ -70,9 +70,9 @@ const recipesDetailData = {
     ]
   },
   '3': {
-    title: "Ratatouille",
-    author: "By Melissa Clark",
-    time: "3 hour",
+    title: "라따뚜이",
+    author: "요리왕",
+    time: "3시간",
     rating: "5 ★★★★★ (3,110)",
     ingredients: [
       "가지 2개",
@@ -93,9 +93,9 @@ const recipesDetailData = {
     ]
   },
   '1000': {
-    title: "Strawberry Pavlova",
-    author: "By Nigella Lawson",
-    time: "2 hours",
+    title: "스트로베리 파블로바",
+    author: "이깡",
+    time: "2시간",
     rating: "5 ★★★★★ (2,941)",
     ingredients: [
       "달걀 흰자 4개",
@@ -116,9 +116,9 @@ const recipesDetailData = {
     ]
   },
   '1001': {
-    title: "Peanut Butter Blossoms",
-    author: "By the Gerrero family",
-    time: "35 minutes",
+    title: "피넛버터 카라멜 쿠키",
+    author: "요알남",
+    time: "35분",
     rating: "5 ★★★★★ (6,913)",
     ingredients: [
       "땅콩버터 1컵",
@@ -139,9 +139,9 @@ const recipesDetailData = {
     ]
   },
   '1002': {
-    title: "Magnolia Bakery's Cupcakes",
-    author: "By Susan Campos",
-    time: "45 minutes",
+    title: "마놀라의 펜케이크",
+    author: "수잔",
+    time: "45분",
     rating: "5 ★★★★★ (3,139)",
     ingredients: [
       "밀가루 1과 1/2컵",
@@ -164,8 +164,54 @@ const recipesDetailData = {
   }
 };
 
+// 카르보나라 레시피의 단계별 아이콘
+const carbonaraStepIcons = {
+  '1': {
+    1: [
+      require('../assets/carbonara/베이컨.png'),
+      require('../assets/carbonara/양파.png'),
+      require('../assets/carbonara/계란.png'),
+      require('../assets/carbonara/파슬리.png'),
+    ],
+    2: [
+      require('../assets/carbonara/면.png'),
+    ],
+    3: [
+      require('../assets/carbonara/올리브유.png'),
+      require('../assets/carbonara/베이컨.png'),
+      require('../assets/carbonara/양파.png'),
+      require('../assets/carbonara/생크림.png'),
+      require('../assets/carbonara/우유.png'),
+    ],
+    4: [
+      require('../assets/carbonara/계란.png'),
+    ],
+    5: [
+      require('../assets/carbonara/치즈.png'),
+      require('../assets/carbonara/파슬리.png'),
+    ],
+  }
+};
+
+// 재료 아이콘 매핑 추가
+const ingredientIcons = {
+  '스파게티': require('../assets/carbonara/면.png'),
+  '베이컨': require('../assets/carbonara/베이컨.png'),
+  '올리브오일': require('../assets/carbonara/올리브유.png'),
+  '달걀': require('../assets/carbonara/계란.png'),
+  '양파': require('../assets/carbonara/양파.png'),
+  '파마산': require('../assets/carbonara/치즈.png'),
+  '페코리노': require('../assets/carbonara/치즈.png'),
+  '파슬리': require('../assets/carbonara/파슬리.png'),
+};
+
 const Recipe = ({ route, navigation }) => {
   const { recipeId } = route.params || {};
+  
+  // 디버깅 로그 추가
+  console.log('Route Params:', route.params);
+  console.log('Recipe ID from params:', recipeId);
+  
   const { isScraped, toggleScrap } = useScrap();
   const isBookmarked = isScraped(recipeId);
 
@@ -278,106 +324,193 @@ const Recipe = ({ route, navigation }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={recipeImages[recipeId]}
-        style={styles.recipeImage}
-      />
-      <View style={styles.recipeHeader}>
-        <Text style={styles.title}>{recipeData.title}</Text>
-        <Text style={styles.author}>{recipeData.author}</Text>
-        <Text style={styles.time}>{recipeData.time}</Text>
-        <Text style={styles.rating}>{recipeData.rating}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>재료</Text>
-        {recipeData.ingredients.map((ingredient, index) => (
-          <Text key={index} style={styles.ingredient}>{ingredient}</Text>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.tabSection}>
-          <TouchableOpacity onPress={() => setActiveTab('조리 방법')}>
-        {/*<Text style={styles.tabSectionTitle}>조리 방법</Text>*/}
-            <Text
-              style={[
-                styles.tabSectionTitle,
-                activeTab === '조리 방법' && styles.activeTab,
-              ]}
-            >
-              조리 방법
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setActiveTab('단계별 조리')}>
-          {/*<Text style={styles.tabSectionTitle}>단계별 조리</Text>*/}
-            <Text
-              style={[
-                styles.tabSectionTitle,
-                activeTab === '단계별 조리' && styles.activeTab,
-              ]}
-            >
-              단계별 조리
-            </Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollContainer}>
+        <Image
+          source={recipeImages[recipeId]}
+          style={styles.recipeImage}
+        />
+        <View style={styles.recipeHeader}>
+          <Text style={styles.title}>{recipeData.title}</Text>
+          <Text style={styles.author}>{recipeData.author}</Text>
+          <Text style={styles.time}>{recipeData.time}</Text>
+          <Text style={styles.rating}>{recipeData.rating}</Text>
         </View>
-        {activeTab === '조리 방법' ? (
-          recipeData.preparation.map((step, index) => (
-            <View key={index} style={styles.stepContainer}>
-              <Text style={styles.stepNumber}>Step {index + 1}</Text>
-              <Text style={styles.stepText}>{step}</Text>
-            </View>
-          ))
-        ) : (
-          <View style={styles.voiceStepContainer}>
-            <Text style={styles.stepNumber}>Step {currentStep + 1}</Text>
-            <Text style={styles.stepText}>
-              {recipeData.preparation[currentStep]}
-            </Text>
 
-            <View style={styles.navigationButtons}>
-              <TouchableOpacity
-                onPress={handlePreviousStep}
-                disabled={currentStep === 0}
+        <View style={[styles.section, { marginBottom: 20 }]}>
+          <Text style={styles.sectionTitle}>재료</Text>
+          <View style={styles.ingredientsContainer}>
+            <View style={styles.divider} />
+            {recipeData.ingredients.map((ingredient, index) => {
+              const [name, amount] = ingredient.split(' ').reduce((acc, part) => {
+                if (/[0-9]/.test(part)) {
+                  acc[1] = (acc[1] ? acc[1] + ' ' : '') + part;
+                } else {
+                  acc[0] = (acc[0] ? acc[0] + ' ' : '') + part;
+                }
+                return acc;
+              }, ['', '']);
+
+              return (
+                <View key={index} style={styles.ingredientRow}>
+                  <View style={styles.ingredientContent}>
+                    {Object.entries(ingredientIcons).map(([key, icon]) => {
+                      if (name.includes(key)) {
+                        return (
+                          <Image
+                            key={key}
+                            source={icon}
+                            style={styles.ingredientIcon}
+                            resizeMode="contain"
+                          />
+                        );
+                      }
+                      return null;
+                    })}
+                    <Text style={styles.ingredientName}>{name}</Text>
+                    <Text style={styles.ingredientAmount}>{amount}</Text>
+                  </View>
+                  {index < recipeData.ingredients.length - 1 && (
+                    <View style={styles.divider} />
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.tabSection}>
+            <TouchableOpacity onPress={() => setActiveTab('조리 방법')}>
+              {/*<Text style={styles.tabSectionTitle}>조리 방법</Text>*/}
+              <Text
                 style={[
-                  styles.navButton,
-                  currentStep === 0 && styles.disabledButton,
+                  styles.tabSectionTitle,
+                  activeTab === '조리 방법' && styles.activeTab,
                 ]}
               >
-                <Text style={styles.navButtonText}>이전</Text>
-                {/*<Feather name="chevron-left" size={24} style={styles.navButtonText} />*/}
-              </TouchableOpacity>
-
-              {/* 듣는 중 메시지 */}
-              {isListening && (
-                <View style={styles.listeningStatus}>
-                  <Text style={styles.listeningText}>듣는 중...</Text>
+                조리 방법
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setActiveTab('단계별 조리')}>
+              {/*<Text style={styles.tabSectionTitle}>단계별 조리</Text>*/}
+              <Text
+                style={[
+                  styles.tabSectionTitle,
+                  activeTab === '단계별 조리' && styles.activeTab,
+                ]}
+              >
+                단계별 조리
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {activeTab === '조리 방법' ? (
+            recipeData.preparation.map((step, index) => (
+              <View 
+                key={index} 
+                style={[
+                  styles.stepContainer,
+                  index === recipeData.preparation.length - 1 && { marginBottom: 80 }  // 마지막 스텝에만 마진 추가
+                ]}
+              >
+                <Text style={styles.stepNumber}>Step {index + 1}</Text>
+                
+                {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][index + 1] && (
+                  <View style={styles.iconsContainer}>
+                    {carbonaraStepIcons['1'][index + 1].map((icon, iconIndex) => (
+                      <Image
+                        key={iconIndex}
+                        source={icon}
+                        style={styles.stepIcon}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </View>
+                )}
+                
+                <Text style={styles.stepText}>{step}</Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.voiceStepContainer}>
+              <Text style={styles.stepNumber}>Step {currentStep + 1}</Text>
+              
+              {(recipeId === 1 || recipeId === '1') && carbonaraStepIcons['1'][currentStep + 1] && (
+                <View style={styles.iconsContainer}>
+                  {carbonaraStepIcons['1'][currentStep + 1].map((icon, index) => (
+                    <Image
+                      key={index}
+                      source={icon}
+                      style={styles.stepIcon}
+                      resizeMode="contain"
+                    />
+                  ))}
                 </View>
               )}
 
-              <TouchableOpacity
-                onPress={handleNextStep}
-                disabled={currentStep === recipeData.preparation.length - 1}
-                style={[
-                  styles.navButton,
-                  currentStep === recipeData.preparation.length - 1 &&
-                  styles.disabledButton,
-                ]}
-              >
-                <Text style={styles.navButtonText}>다음</Text>
-                {/*<Feather name="chevron-right" size={24} style={styles.navButtonText} />*/}
-              </TouchableOpacity>
+              <Text style={styles.stepText}>
+                {recipeData.preparation[currentStep]}
+              </Text>
+
+              <View style={styles.navigationButtons}>
+                <TouchableOpacity
+                  onPress={handlePreviousStep}
+                  disabled={currentStep === 0}
+                  style={[
+                    styles.navButton,
+                    currentStep === 0 && styles.disabledButton,
+                  ]}
+                >
+                  <Text style={styles.navButtonText}>이전</Text>
+                  {/*<Feather name="chevron-left" size={24} style={styles.navButtonText} />*/}
+                </TouchableOpacity>
+
+                {/* 듣는 중 메시지 */}
+                {isListening && (
+                  <View style={styles.listeningStatus}>
+                    <Text style={styles.listeningText}>듣는 중...</Text>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  onPress={handleNextStep}
+                  disabled={currentStep === recipeData.preparation.length - 1}
+                  style={[
+                    styles.navButton,
+                    currentStep === recipeData.preparation.length - 1 &&
+                    styles.disabledButton,
+                  ]}
+                >
+                  <Text style={styles.navButtonText}>다음</Text>
+                  {/*<Feather name="chevron-right" size={24} style={styles.navButtonText} />*/}
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
-      </View>
-    </ScrollView>
+          )}
+        </View>
+      </ScrollView>
+
+      {activeTab === '조리 방법' && (
+        <TouchableOpacity
+          style={styles.cookButton}
+          onPress={() => navigation.navigate('CookingSteps', {
+            recipeId: recipeId,
+            recipeData: recipeData
+          })}
+        >
+          <Text style={styles.cookButtonText}>요리하기</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#121212',
+  },
+  scrollContainer: {
     flex: 1,
     backgroundColor: '#121212',
     paddingHorizontal: 0,
@@ -441,6 +574,10 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     marginBottom: 16,
+    backgroundColor: '#242225',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 12,
   },
   voiceStepContainer: {
     marginBottom: 16,
@@ -459,6 +596,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     lineHeight: 24,
+    marginTop: 4,
   },
   recipeImage: {
     width: '100%',
@@ -485,12 +623,92 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   listeningStatus: {
-    marginHorizontal: 16, // 버튼 사이 여백
+    marginHorizontal: 16,
     alignItems: 'center',
   },
   listeningText: {
     fontSize: 16,
     color: '#FFFFFF',
+  },
+  cookButton: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+    backgroundColor: '#242225',
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#878787',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  cookButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+    gap: 12,
+    padding: 4,
+  },
+  stepIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2A2A2A',
+    resizeMode: 'contain',
+  },
+  ingredientsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    position: 'relative',
+  },
+  ingredientRow: {
+    width: '45%',
+    marginBottom: 16,
+    position: 'relative',
+  },
+  ingredientContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  divider: {
+    position: 'absolute',
+    left: '50%',
+    top: 0,
+    bottom: 16,
+    width: 1,
+    backgroundColor: '#333333',
+  },
+  ingredientIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
+  ingredientName: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  ingredientAmount: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    marginLeft: 8,
   },
 });
 

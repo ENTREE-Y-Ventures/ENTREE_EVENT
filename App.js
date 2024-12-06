@@ -1,15 +1,16 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {SafeAreaView, StatusBar, StyleSheet, Image, TouchableOpacity, Platform, PermissionsAndroid} from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, Image, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
 import Home from './src/screens/Home';
 import Scrap from './src/screens/Scrap';
 import Search from './src/screens/Search';
 import Recipe from './src/screens/Recipe';
+import CookingSteps from './src/screens/CookingSteps';
 import { ScrapProvider } from './src/components/ScrapContext';
-import {check, PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,6 +37,19 @@ const HomeStack = () => (
         headerTitle: '레시피',
         headerStyle: { backgroundColor: '#121212' },
         headerTintColor: '#fff',
+        tabBarStyle: { display: 'none' }
+      }}
+    />
+    <Stack.Screen
+      name="CookingSteps"
+      component={CookingSteps}
+      options={{
+        title: '조리순서',
+        headerStyle: {
+          backgroundColor: '#121212',
+        },
+        headerTintColor: '#FFFFFF',
+        tabBarStyle: { display: 'none' }
       }}
     />
   </Stack.Navigator>
@@ -59,6 +73,19 @@ const ScrapStack = () => (
         headerTitle: '레시피',
         headerStyle: { backgroundColor: '#121212' },
         headerTintColor: '#fff',
+        tabBarStyle: { display: 'none' }
+      }}
+    />
+    <Stack.Screen
+      name="CookingSteps"
+      component={CookingSteps}
+      options={{
+        title: '조리순서',
+        headerStyle: {
+          backgroundColor: '#121212',
+        },
+        headerTintColor: '#FFFFFF',
+        tabBarStyle: { display: 'none' }
       }}
     />
   </Stack.Navigator>
@@ -82,6 +109,19 @@ const SearchStack = () => (
         headerTitle: '레시피',
         headerStyle: { backgroundColor: '#121212' },
         headerTintColor: '#fff',
+        tabBarStyle: { display: 'none' }
+      }}
+    />
+    <Stack.Screen
+      name="CookingSteps"
+      component={CookingSteps}
+      options={{
+        title: '조리순서',
+        headerStyle: {
+          backgroundColor: '#121212',
+        },
+        headerTintColor: '#FFFFFF',
+        tabBarStyle: { display: 'none' }
       }}
     />
   </Stack.Navigator>
@@ -89,11 +129,18 @@ const SearchStack = () => (
 
 const TabNavigator = () => (
   <Tab.Navigator
-    screenOptions={{
+    screenOptions={({ route, navigation }) => ({
       tabBarStyle: {
         backgroundColor: '#252525',
         height: 60,
         borderTopWidth: 0,
+        display: (() => {
+          const routeState = navigation.getState();
+          const currentRoute = routeState.routes[routeState.index];
+          const isRecipeOrCookingSteps = currentRoute.state?.routes?.slice(-1)[0]?.name === 'Recipe' || 
+                                       currentRoute.state?.routes?.slice(-1)[0]?.name === 'CookingSteps';
+          return isRecipeOrCookingSteps ? 'none' : 'flex';
+        })(),
       },
       tabBarLabelStyle: {
         fontSize: 12,
@@ -101,7 +148,7 @@ const TabNavigator = () => (
       tabBarActiveTintColor: '#FD802D',
       tabBarInactiveTintColor: '#878787',
       headerShown: false,
-    }}
+    })}
   >
     <Tab.Screen
       name="홈"
