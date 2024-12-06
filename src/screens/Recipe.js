@@ -210,6 +210,12 @@ const ingredientIcons = {
 const ingredientLinks = {
   '베이컨': 'https://www.coupang.com/vp/products/7863433926?itemId=21463922944&vendorItemId=88518342003',
   '스파게티': 'https://www.coupang.com/vp/products/6444836231?itemId=19492096&vendorItemId=85320856065&pickType=COU_PICK&q=%EC%8A%A4%ED%8C%8C%EA%B2%8C%ED%8B%B0%EB%A9%B4&itemsCount=35&searchId=7e9ff04d6d4747a286c907475cf8484e&rank=1&searchRank=1&isAddedCart=',
+  '올리브오일': 'https://www.coupang.com/vp/products/5148727355?itemId=23666716119&vendorItemId=77367783821&q=%EC%98%AC%EB%A6%AC%EB%B8%8C%EC%98%A4%EC%9D%BC&itemsCount=36&searchId=f421abc4466a4a6caa9c41803006a150&rank=3&searchRank=3&isAddedCart=',
+  '달걀': 'https://www.coupang.com/vp/products/1160574750?itemId=2137165485&vendorItemId=70135597923&q=%EB%8B%AC%EA%B1%80&itemsCount=36&searchId=764b87bc741a47229393206bcc46a39e&rank=6&searchRank=6&isAddedCart=',
+  '양파': 'https://www.coupang.com/vp/products/1074470755?itemId=2573048645&vendorItemId=70565380605&pickType=COU_PICK&q=%EC%96%91%ED%8C%8C&itemsCount=36&searchId=9177476ca7e6461f9ac5c8955105e9f4&rank=0&searchRank=0&isAddedCart=',
+  '파마산': 'https://www.coupang.com/vp/products/6793410516?itemId=4839780&vendorItemId=3000580066&q=%ED%8C%8C%EB%A7%88%EC%82%B0&itemsCount=36&searchId=3982a6d318514c8c8a4427c10340669b&rank=0&searchRank=0&isAddedCart=',
+  '페코리노': 'https://www.coupang.com/vp/products/1119361454?itemId=2084835786&vendorItemId=70083851046&pickType=COU_PICK&q=%ED%8E%98%EC%BD%94%EB%A6%AC%EB%85%B8&itemsCount=36&searchId=c9a34dbd40304ba38e8ac04965a24abc&rank=0&searchRank=0&isAddedCart=',
+  '파슬리': 'https://www.coupang.com/vp/products/8167360545?itemId=15183051084&vendorItemId=3000058950&q=%ED%8C%8C%EC%8A%AC%EB%A6%AC&itemsCount=36&searchId=cb7cb257816542229e4017a11480caa3&rank=1&searchRank=1',
 };
 
 const Recipe = ({ route, navigation }) => {
