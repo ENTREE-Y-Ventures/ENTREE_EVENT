@@ -84,6 +84,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     signingConfigs {
         debug {
@@ -116,4 +117,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // 기존 support 라이브러리 의존성을 제거하고 androidx로 변경
+    implementation "androidx.core:core:1.9.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
 }
